@@ -1,27 +1,38 @@
 import { parseArgs } from "jsr:@std/cli/parse-args";
+import { error } from "./utils.ts";
 
 interface CliFlagsHelp {
   help: true;
 }
 
-interface CliFlagsDefault {
-  help?: false;
-  name: string;
+interface CliArgs {
+  source: string;
+  target: string;
 }
 
-export type CliFlags = CliFlagsHelp | CliFlagsDefault;
+interface CliFlagsDefault {
+  help?: false;
+}
 
-export function readArgs(): CliFlags {
+export type CliArguments = CliFlagsHelp | (CliFlagsDefault & CliArgs);
+
+export function readArgs(): CliArguments {
   const flags = parseArgs(Deno.args, {
     boolean: ["help"],
-    string: ["name"],
     alias: {
       help: ["h"],
-      name: ["n"],
     },
   });
 
   if (flags.help) return { help: true };
 
-  return { name: flags.name ?? "World", help: false };
+  const [source, target] = flags._ as string[];
+
+  if (!source || !target) {
+    error("Both SOURCE and TARGET arguments are required.");
+
+    Deno.exit(1);
+  }
+
+  return { help: false, source, target } as CliArguments;
 }
