@@ -1,5 +1,4 @@
 import { parseArgs } from "jsr:@std/cli/parse-args";
-import { error } from "./utils.ts";
 
 interface CliFlagsHelp {
   help: true;
@@ -29,9 +28,7 @@ export function readArgs(): CliArguments {
   const [source, target] = flags._ as string[];
 
   if (!source || !target) {
-    error("Both SOURCE and TARGET arguments are required.");
-
-    Deno.exit(1);
+    throw new Error("Both SOURCE and TARGET arguments are required.");
   }
 
   return { help: false, source, target } as CliArguments;

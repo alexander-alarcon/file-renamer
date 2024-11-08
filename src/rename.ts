@@ -18,6 +18,10 @@ export async function rename(source: string, target: string): Promise<void> {
       throw new Error(`File or directory "${source}" not found.`);
     }
 
+    if (e instanceof Error) {
+      throw e;
+    }
+
     throw new Error(
       `Unexpected error renaming "${source}" -> "${target}": ${e}`,
     );
