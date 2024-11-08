@@ -1,6 +1,7 @@
-import { type CliArguments, readArgs } from "./args.ts";
+import { readArgs } from "./args.ts";
 import { printHelp } from "./help.ts";
 import { rename } from "./rename.ts";
+import { CliArguments } from "./types.ts";
 import { error } from "./utils.ts";
 
 async function main(): Promise<void> {
@@ -13,7 +14,7 @@ async function main(): Promise<void> {
   }
 
   try {
-    await rename(args.source, args.target);
+    await rename(args);
   } catch (e: unknown) {
     if (e instanceof Error) {
       error(e.message);

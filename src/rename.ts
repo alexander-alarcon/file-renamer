@@ -1,18 +1,40 @@
-function sourceAndTargetEquals(source: string, target: string): void {
-  if (source === target) {
-    throw new Error("SOURCE and TARGET must be different.");
+import { basename, extname } from "jsr:@std/path";
+
+import { RenameWithPrefixSuffix } from "./types.ts";
+import { validateArgs } from "./utils/validateRename.ts";
+
+function addPrefix(source: string, prefix: string) {
+  const ext = extname(source);
+  const base = basename(source, ext);
+
+  return `${prefix}${base}${ext}`;
+}
+
+function addSuffix(source: string, suffix: string) {
+  const ext = extname(source);
+  const base = basename(source, ext);
+
+  return `${base}${suffix}${ext}`;
+}
+
+export async function rename(args: RenameWithPrefixSuffix): Promise<void> {
+  const { source, target, prefix, suffix } = args;
+
+  validateArgs(args);
+
+  let finalTarget: string | undefined = target;
+  finalTarget ??= source;
+
+  if (prefix) {
+    finalTarget = addPrefix(finalTarget, prefix);
   }
-}
 
-function validateArgs(source: string, target: string): void {
-  sourceAndTargetEquals(source, target);
-}
-
-export async function rename(source: string, target: string): Promise<void> {
-  validateArgs(source, target);
+  if (suffix) {
+    finalTarget = addSuffix(finalTarget, suffix);
+  }
 
   try {
-    await Deno.rename(source, target);
+    await Deno.rename(source, finalTarget);
   } catch (e: unknown) {
     if (e instanceof Deno.errors.NotFound) {
       throw new Error(`File or directory "${source}" not found.`);
