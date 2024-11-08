@@ -1,7 +1,8 @@
 import { assertEquals } from "jsr:@std/assert";
-import { assertThrows } from "jsr:@std/assert/throws";
+import { assertType, IsExact } from "jsr:@std/testing/types";
 
-import { type CliArguments, readArgs } from "../src/args.ts";
+import { readArgs } from "../src/args.ts";
+import { CliArguments, Help, RenameWithPrefixSuffix } from "../src/types.ts";
 
 function getArgs(): string[] {
   return Deno.args;
@@ -29,6 +30,7 @@ Deno.test({
     mockArgs(["-h"], () => {
       const args = readArgs();
 
+      assertType<IsExact<typeof args, Help>>;
       assertEquals(args.help, true);
     });
   },
@@ -40,6 +42,7 @@ Deno.test({
     mockArgs(["--help"], () => {
       const args = readArgs();
 
+      assertType<IsExact<typeof args, Help>>;
       assertEquals(args.help, true);
     });
   },
@@ -51,7 +54,9 @@ Deno.test({
     mockArgs(["source.txt", "target.txt"], () => {
       const args: CliArguments = readArgs();
 
-      if (!args.help && args.source && args.target) {
+      assertType<IsExact<typeof args, RenameWithPrefixSuffix>>;
+
+      if (!args.help) {
         assertEquals(args.source, "source.txt");
         assertEquals(args.target, "target.txt");
         assertEquals(args.help, false);
@@ -61,40 +66,118 @@ Deno.test({
 });
 
 Deno.test({
-  name: "Should throw error if source is missing",
+  name: "Should get source and target with prefix",
   fn() {
-    mockArgs(["", "target.txt"], () => {
-      assertThrows(
-        readArgs,
-        Error,
-        "Both SOURCE and TARGET arguments are required.",
-      );
+    mockArgs(["source.txt", "target.txt", "--prefix", "00_"], () => {
+      const args: CliArguments = readArgs();
+
+      assertType<IsExact<typeof args, RenameWithPrefixSuffix>>;
+
+      if (!args.help) {
+        assertEquals(args.source, "source.txt");
+        assertEquals(args.target, "target.txt");
+        assertEquals(args.prefix, "00_");
+        assertEquals(args.help, false);
+        assertEquals(args.suffix, undefined);
+      }
     });
   },
 });
 
 Deno.test({
-  name: "Should throw error if target is missing",
+  name: "Should target be empty when prefix is provided and target is not provided",
   fn() {
-    mockArgs(["source.txt", ""], () => {
-      assertThrows(
-        readArgs,
-        Error,
-        "Both SOURCE and TARGET arguments are required.",
-      );
+    mockArgs(["source.txt", "", "--prefix", "00_"], () => {
+      const args: CliArguments = readArgs();
+
+      assertType<IsExact<typeof args, RenameWithPrefixSuffix>>;
+
+      if (!args.help) {
+        assertEquals(args.source, "source.txt");
+        assertEquals(args.target, "");
+        assertEquals(args.prefix, "00_");
+        assertEquals(args.help, false);
+        assertEquals(args.suffix, undefined);
+      }
     });
   },
 });
 
 Deno.test({
-  name: "Should throw error if source and target are missing",
+  name: "Should get source and target with suffix",
   fn() {
-    mockArgs(["", ""], () => {
-      assertThrows(
-        readArgs,
-        Error,
-        "Both SOURCE and TARGET arguments are required.",
-      );
+    mockArgs(["source.txt", "target.txt", "--suffix", "_00"], () => {
+      const args: CliArguments = readArgs();
+
+      assertType<IsExact<typeof args, RenameWithPrefixSuffix>>;
+
+      if (!args.help) {
+        assertEquals(args.source, "source.txt");
+        assertEquals(args.target, "target.txt");
+        assertEquals(args.suffix, "_00");
+        assertEquals(args.help, false);
+        assertEquals(args.prefix, undefined);
+      }
+    });
+  },
+});
+
+Deno.test({
+  name: "Should target be empty when suffix is provided and target is not provided",
+  fn() {
+    mockArgs(["source.txt", "", "--suffix", "_00"], () => {
+      const args: CliArguments = readArgs();
+
+      assertType<IsExact<typeof args, RenameWithPrefixSuffix>>;
+
+      if (!args.help) {
+        assertEquals(args.source, "source.txt");
+        assertEquals(args.target, "");
+        assertEquals(args.suffix, "_00");
+        assertEquals(args.help, false);
+        assertEquals(args.prefix, undefined);
+      }
+    });
+  },
+});
+
+Deno.test({
+  name: "Should get source and target with prefix and suffix",
+  fn() {
+    mockArgs(
+      ["source.txt", "target.txt", "--prefix", "00_", "--suffix", "_00"],
+      () => {
+        const args: CliArguments = readArgs();
+
+        assertType<IsExact<typeof args, RenameWithPrefixSuffix>>;
+
+        if (!args.help) {
+          assertEquals(args.source, "source.txt");
+          assertEquals(args.target, "target.txt");
+          assertEquals(args.prefix, "00_");
+          assertEquals(args.suffix, "_00");
+          assertEquals(args.help, false);
+        }
+      },
+    );
+  },
+});
+
+Deno.test({
+  name: "Should get source and target is empty with prefix and suffix",
+  fn() {
+    mockArgs(["source.txt", "", "--prefix", "00_", "--suffix", "_00"], () => {
+      const args: CliArguments = readArgs();
+
+      assertType<IsExact<typeof args, RenameWithPrefixSuffix>>;
+
+      if (!args.help) {
+        assertEquals(args.source, "source.txt");
+        assertEquals(args.target, "");
+        assertEquals(args.prefix, "00_");
+        assertEquals(args.suffix, "_00");
+        assertEquals(args.help, false);
+      }
     });
   },
 });
