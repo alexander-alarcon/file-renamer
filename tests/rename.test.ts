@@ -52,7 +52,7 @@ Deno.test({
     assertRejects(
       () => rename({ source: "a.txt", prefix: "    ", suffix: "11" }),
       Error,
-      "Prefix cannot be empty or consist of only whitespace.",
+      "When any flag is provided, target is required and cannot be empty or consist of only whitespace.",
     );
   },
 });
@@ -63,18 +63,19 @@ Deno.test({
     assertRejects(
       () => rename({ source: "a.txt", prefix: "11", suffix: "\t" }),
       Error,
-      "Suffix cannot be empty or consist of only whitespace.",
+      "When any flag is provided, target is required and cannot be empty or consist of only whitespace.",
     );
   },
 });
 
 Deno.test({
-  name: "Should throw error if target is empty when prefix and suffix are not provided",
+  name:
+    "Should throw error if target is empty when prefix and suffix are not provided",
   fn() {
     assertRejects(
       () => rename({ source: "a.txt", target: "", prefix: "", suffix: "" }),
       Error,
-      "When no prefix or suffix is provided, target is required and cannot be empty or consist of only whitespace.",
+      "When any flag is provided, target is required and cannot be empty or consist of only whitespace.",
     );
   },
 });

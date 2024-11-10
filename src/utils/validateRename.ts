@@ -22,7 +22,15 @@ function validateTargetIfNoKeysPresent(
   args: RenameWithOptions,
   keys: (keyof RenameWithOptions)[],
 ): void {
-  const hasAnyKey = keys.some((key) => key in args && args[key]);
+  const hasAnyKey = keys.every((key) => {
+    const value = args[key];
+
+    if (typeof value === "string") {
+      return value.trim().length > 0;
+    }
+
+    return true;
+  });
 
   if (!hasAnyKey && (!args.target || !args.target?.trim().length)) {
     throw new Error(

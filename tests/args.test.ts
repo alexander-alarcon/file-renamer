@@ -85,7 +85,8 @@ Deno.test({
 });
 
 Deno.test({
-  name: "Should target be empty when prefix is provided and target is not provided",
+  name:
+    "Should target be empty when prefix is provided and target is not provided",
   fn() {
     mockArgs(["source.txt", "", "--prefix", "00_"], () => {
       const args: CliArguments = readArgs();
@@ -123,7 +124,8 @@ Deno.test({
 });
 
 Deno.test({
-  name: "Should target be empty when suffix is provided and target is not provided",
+  name:
+    "Should target be empty when suffix is provided and target is not provided",
   fn() {
     mockArgs(["source.txt", "", "--suffix", "_00"], () => {
       const args: CliArguments = readArgs();
@@ -176,6 +178,42 @@ Deno.test({
         assertEquals(args.target, "");
         assertEquals(args.prefix, "00_");
         assertEquals(args.suffix, "_00");
+        assertEquals(args.help, false);
+      }
+    });
+  },
+});
+
+Deno.test({
+  name: "Should get only numbers flag",
+  fn() {
+    mockArgs(["source.txt", "target.txt", "--only-numbers"], () => {
+      const args: CliArguments = readArgs();
+
+      assertType<IsExact<typeof args, RenameWithOptions>>;
+
+      if (!args.help) {
+        assertEquals(args.source, "source.txt");
+        assertEquals(args.target, "target.txt");
+        assertEquals(args.onlyNumbers, true);
+        assertEquals(args.help, false);
+      }
+    });
+  },
+});
+
+Deno.test({
+  name: "Should get only numbers flag with empty target",
+  fn() {
+    mockArgs(["source.txt", "", "--only-numbers"], () => {
+      const args: CliArguments = readArgs();
+
+      assertType<IsExact<typeof args, RenameWithOptions>>;
+
+      if (!args.help) {
+        assertEquals(args.source, "source.txt");
+        assertEquals(args.target, "");
+        assertEquals(args.onlyNumbers, true);
         assertEquals(args.help, false);
       }
     });
