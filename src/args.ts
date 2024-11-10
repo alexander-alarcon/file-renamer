@@ -1,25 +1,33 @@
 import { parseArgs } from "jsr:@std/cli/parse-args";
 
-import { CliArguments, RenameWithPrefixSuffix } from "./types.ts";
+import { CliArguments, RenameWithOptions } from "./types.ts";
 
 export function readArgs(): CliArguments {
-  const flags = parseArgs(Deno.args, {
-    boolean: ["help"],
+  const parsedArgs = parseArgs(Deno.args, {
+    boolean: ["help", "only-numbers"],
     string: ["prefix", "suffix"],
     alias: {
       help: ["h"],
+      onlyNumbers: ["only-numbers"],
+    },
+    default: {
+      help: false,
+      prefix: undefined,
+      suffix: undefined,
+      onlyNumber: false,
     },
   });
 
-  if (flags.help) return { help: true };
+  if (parsedArgs.help) return { help: true };
 
-  const [source, target] = flags._ as string[];
+  const [source, target] = parsedArgs._ as string[];
 
   return {
-    help: false,
     source,
     target,
-    prefix: flags.prefix ?? undefined,
-    suffix: flags.suffix ?? undefined,
-  } as RenameWithPrefixSuffix;
+    help: parsedArgs.help,
+    prefix: parsedArgs.prefix,
+    suffix: parsedArgs.suffix,
+    onlyNumbers: parsedArgs.onlyNumbers,
+  } as RenameWithOptions;
 }

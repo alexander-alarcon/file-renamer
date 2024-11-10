@@ -1,41 +1,41 @@
-import { RenameWithPrefixSuffix } from "../types.ts";
+import { RenameWithOptions } from "../types.ts";
 
-function sourceIsRequired({ source }: RenameWithPrefixSuffix): void {
+const OPTIONS = {
+  PREFIX: "prefix",
+  SUFFIX: "suffix",
+  ONLY_NUMBERS: "onlyNumbers",
+} as const;
+
+function sourceIsRequired({ source }: RenameWithOptions): void {
   if (!source) {
     throw new Error("SOURCE argument is required.");
   }
 }
 
-function sourceAndTargetEquals({
-  source,
-  target,
-}: RenameWithPrefixSuffix): void {
+function sourceAndTargetEquals({ source, target }: RenameWithOptions): void {
   if (source === target) {
     throw new Error("SOURCE and TARGET must be different.");
   }
 }
 
-function validateOptions({
-  target,
-  prefix,
-  suffix,
-}: RenameWithPrefixSuffix): void {
-  if (prefix && !prefix.trim().length) {
-    throw new Error("Prefix cannot be empty or consist of only whitespace.");
-  }
+function validateTargetIfNoKeysPresent(
+  args: RenameWithOptions,
+  keys: (keyof RenameWithOptions)[],
+): void {
+  const hasAnyKey = keys.some((key) => key in args && args[key]);
 
-  if (suffix && !suffix.trim().length) {
-    throw new Error("Suffix cannot be empty or consist of only whitespace.");
-  }
-
-  if (!prefix && !suffix && (!target || !target?.trim().length)) {
+  if (!hasAnyKey && (!args.target || !args.target?.trim().length)) {
     throw new Error(
-      "When no prefix or suffix is provided, target is required and cannot be empty or consist of only whitespace.",
+      "When any flag is provided, target is required and cannot be empty or consist of only whitespace.",
     );
   }
 }
 
-export function validateArgs(args: RenameWithPrefixSuffix): void {
+function validateOptions(args: RenameWithOptions): void {
+  validateTargetIfNoKeysPresent(args, Object.values(OPTIONS));
+}
+
+export function validateArgs(args: RenameWithOptions): void {
   sourceIsRequired(args);
   sourceAndTargetEquals(args);
   validateOptions(args);

@@ -1,29 +1,41 @@
 import { basename, extname } from "jsr:@std/path";
 
-import { RenameWithPrefixSuffix } from "./types.ts";
+import { RenameWithOptions } from "./types.ts";
 import { validateArgs } from "./utils/validateRename.ts";
+
+function removeNonNumeric(source: string) {
+  const ext = extname(source);
+  const base = basename(source, ext);
+
+  return `${base.replace(/\D/g, "")}${ext}`;
+}
 
 function addPrefix(source: string, prefix: string) {
   const ext = extname(source);
   const base = basename(source, ext);
 
-  return `${prefix}${base}${ext}`;
+  return `${prefix}${base}`;
 }
 
 function addSuffix(source: string, suffix: string) {
   const ext = extname(source);
   const base = basename(source, ext);
 
-  return `${base}${suffix}${ext}`;
+  return `${base}${suffix}`;
 }
 
-export async function rename(args: RenameWithPrefixSuffix): Promise<void> {
-  const { source, target, prefix, suffix } = args;
+export async function rename(args: RenameWithOptions): Promise<void> {
+  const { source, target, prefix, suffix, onlyNumbers } = args;
 
   validateArgs(args);
 
   let finalTarget: string | undefined = target;
   finalTarget ??= source;
+  const ext = extname(source);
+
+  if (onlyNumbers) {
+    finalTarget = removeNonNumeric(finalTarget);
+  }
 
   if (prefix) {
     finalTarget = addPrefix(finalTarget, prefix);
@@ -31,6 +43,12 @@ export async function rename(args: RenameWithPrefixSuffix): Promise<void> {
 
   if (suffix) {
     finalTarget = addSuffix(finalTarget, suffix);
+  }
+
+  if (finalTarget.trim().length === 0 || finalTarget === ext) {
+    throw new Error(
+      "Final target cannot be empty or consist of only whitespace.",
+    );
   }
 
   try {

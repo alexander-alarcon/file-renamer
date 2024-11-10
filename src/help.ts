@@ -11,7 +11,7 @@ export function printHelp(): void {
     "color: initial",
   );
   console.log(
-    `  %cTARGET\t%cThe target file or directory name (optional, required if no prefix/suffix are provided)`,
+    `  %cTARGET\t%cThe target file or directory name (optional, required if any flag is provided)`,
     "color: #32CD32; font-weight: bold;",
     "color: initial",
   );
@@ -29,6 +29,12 @@ export function printHelp(): void {
   );
   console.log(
     `  %c--suffix SUFFIX\t%cSuffix to add to the source name`,
+    "color: #32CD32; font-weight: bold;",
+    "color: initial",
+  );
+
+  console.log(
+    `  %c--only-numbers\t%cRemoves any non-numeric characters from the SOURCE name, keeping only the numbers.`,
     "color: #32CD32; font-weight: bold;",
     "color: initial",
   );

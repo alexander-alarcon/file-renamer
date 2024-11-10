@@ -2,7 +2,7 @@ import { assertEquals } from "jsr:@std/assert";
 import { assertType, IsExact } from "jsr:@std/testing/types";
 
 import { readArgs } from "../src/args.ts";
-import { CliArguments, Help, RenameWithPrefixSuffix } from "../src/types.ts";
+import { CliArguments, Help, RenameWithOptions } from "../src/types.ts";
 
 function getArgs(): string[] {
   return Deno.args;
@@ -54,7 +54,7 @@ Deno.test({
     mockArgs(["source.txt", "target.txt"], () => {
       const args: CliArguments = readArgs();
 
-      assertType<IsExact<typeof args, RenameWithPrefixSuffix>>;
+      assertType<IsExact<typeof args, RenameWithOptions>>;
 
       if (!args.help) {
         assertEquals(args.source, "source.txt");
@@ -71,7 +71,7 @@ Deno.test({
     mockArgs(["source.txt", "target.txt", "--prefix", "00_"], () => {
       const args: CliArguments = readArgs();
 
-      assertType<IsExact<typeof args, RenameWithPrefixSuffix>>;
+      assertType<IsExact<typeof args, RenameWithOptions>>;
 
       if (!args.help) {
         assertEquals(args.source, "source.txt");
@@ -90,7 +90,7 @@ Deno.test({
     mockArgs(["source.txt", "", "--prefix", "00_"], () => {
       const args: CliArguments = readArgs();
 
-      assertType<IsExact<typeof args, RenameWithPrefixSuffix>>;
+      assertType<IsExact<typeof args, RenameWithOptions>>;
 
       if (!args.help) {
         assertEquals(args.source, "source.txt");
@@ -109,7 +109,7 @@ Deno.test({
     mockArgs(["source.txt", "target.txt", "--suffix", "_00"], () => {
       const args: CliArguments = readArgs();
 
-      assertType<IsExact<typeof args, RenameWithPrefixSuffix>>;
+      assertType<IsExact<typeof args, RenameWithOptions>>;
 
       if (!args.help) {
         assertEquals(args.source, "source.txt");
@@ -128,7 +128,7 @@ Deno.test({
     mockArgs(["source.txt", "", "--suffix", "_00"], () => {
       const args: CliArguments = readArgs();
 
-      assertType<IsExact<typeof args, RenameWithPrefixSuffix>>;
+      assertType<IsExact<typeof args, RenameWithOptions>>;
 
       if (!args.help) {
         assertEquals(args.source, "source.txt");
@@ -149,7 +149,7 @@ Deno.test({
       () => {
         const args: CliArguments = readArgs();
 
-        assertType<IsExact<typeof args, RenameWithPrefixSuffix>>;
+        assertType<IsExact<typeof args, RenameWithOptions>>;
 
         if (!args.help) {
           assertEquals(args.source, "source.txt");
@@ -169,7 +169,7 @@ Deno.test({
     mockArgs(["source.txt", "", "--prefix", "00_", "--suffix", "_00"], () => {
       const args: CliArguments = readArgs();
 
-      assertType<IsExact<typeof args, RenameWithPrefixSuffix>>;
+      assertType<IsExact<typeof args, RenameWithOptions>>;
 
       if (!args.help) {
         assertEquals(args.source, "source.txt");
